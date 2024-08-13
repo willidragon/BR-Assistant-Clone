@@ -15,7 +15,8 @@ langchain-community = "^0.2.11"
 langchain-openai = "^0.1.21"
 python-decouple = "^3.8"
 
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
