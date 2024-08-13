@@ -1,8 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
-from src.chatlogic import get_answer
-from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from src.chatlogic import get_answer
+import logging
+
 
 app = FastAPI(
     title="Chatbot API",
@@ -10,16 +12,28 @@ app = FastAPI(
     version="0.1",
 )
 
-origins = [
-    "http://localhost:3000",
-]
+# Set up logging
+logging.basicConfig(level=logging.INFO)
+
+# Log the origin of incoming requests
+@app.middleware("http")
+async def log_origin(request: Request, call_next):
+    origin = request.headers.get("origin")
+    logging.info(f"Request origin: {origin}")
+    response = await call_next(request)
+    return response
+
+# origins = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:8000"
+#     # Add other origins here as you identify them
+# ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    # allow_credentials=True,
-    allow_methods=["*"],
-    # allow_headers=["*"],
+    allow_origins=["*"],  # Allow all origins
+    allow_methods=["*"],  # Allow all methods (GET, POST, etc.)
+    allow_headers=["*"],  # Allow all headers
 )
 
 class Message(BaseModel):
