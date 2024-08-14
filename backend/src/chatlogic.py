@@ -1,9 +1,16 @@
+# chatlogic.py
+
 from langchain_core.prompts.chat import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough, RunnableParallel
 from langchain_openai import ChatOpenAI
+from langchain_core.utils.function_calling import convert_to_openai_function
+from langchain.agents.output_parsers import OpenAIFunctionsAgentOutputParser
 
 from decouple import config
 from operator import itemgetter
+from custom_tools import *
+
+tools = [get_recipe_field, change_field_data]
 
 model = ChatOpenAI(
 
