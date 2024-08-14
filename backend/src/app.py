@@ -4,7 +4,8 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from src.chatlogic import get_answer
+# from src.chatlogic import get_answer
+from src.chatlogic_modify import get_answer
 import logging
 
 
@@ -45,7 +46,7 @@ class Message(BaseModel):
 def chat(message: Message):
     response = get_answer(message)
     response_content = {
-        "question": message.message,
+        "input": message.message,
         "answer": response["answer"],
     }
 

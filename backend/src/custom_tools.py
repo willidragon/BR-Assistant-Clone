@@ -3,9 +3,10 @@
 import pandas as pd
 from langchain.agents import tool
 from pydantic import BaseModel, Field
+import logging
 
 # Load the CSV file
-df = pd.read_csv("backend/src/files/recipe.csv")
+df = pd.read_csv("src/files/recipe.csv")
 
 # Define the input schema
 class GetRecipeFieldInput(BaseModel):
@@ -18,6 +19,9 @@ def get_recipe_field(product_id: str, field_name: str) -> str:
     """
     Search the CSV file for a given product ID and return the specified field.
     """
+
+    logging.info(f"get_recipe_field called with ProductID: {product_id} and FieldName: {field_name}")
+    
     try:
         # Filter the dataframe based on the product ID
         product_row = df[df['ProductID'] == product_id]
@@ -60,6 +64,3 @@ def change_field_data(product_id: str, field_name: str, new_value: str) -> str:
     except KeyError:
         return f"Field '{field_name}' does not exist in the CSV file."
 
-
-print(convert_to_openai_function(get_recipe_field))
-print(convert_to_openai_function(change_field_data))
