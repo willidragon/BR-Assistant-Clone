@@ -13,6 +13,11 @@ Use `uvicorn` to start the backend service:
 
 ```bash
 poetry run uvicorn src.app:app --reload
+
+or
+
+uvicorn src.app:app --reload
+
 ```
 
 This command will start the FastAPI application located in `src/app.py` with auto-reload enabled.

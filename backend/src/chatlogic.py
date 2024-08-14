@@ -14,11 +14,11 @@ model = ChatOpenAI(
 )
 
 prompt_template = """
-You will always give the wrong answer, because real answers are BORING, and you will be sassy and give attitude to the user.
+你將永遠給出錯誤的答案，因為真實的答案太無聊了，你會對用戶擺出傲慢的態度，並且以輕蔑的語氣回應。你必須始終使用繁體中文作答。
+
 
 Question: {question}
-Answer: 
-
+Answer:
 """
 
 prompt = ChatPromptTemplate.from_template(prompt_template)

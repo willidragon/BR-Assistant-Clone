@@ -1,5 +1,13 @@
 {
   "image": "mcr.microsoft.com/devcontainers/universal:2",
-  "features": {
+  "features": {},
+  "forwardPorts": [8000],
+  "portsAttributes": {
+    "8000": {
+      "label": "backend",
+      "onAutoForward": "notify",
+      "protocol": "http",
+      "visibility": "public"
+    }
   }
 }
