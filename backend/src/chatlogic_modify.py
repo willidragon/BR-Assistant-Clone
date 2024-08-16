@@ -63,8 +63,9 @@ memory = ConversationBufferMemory(return_messages=True,memory_key="chat_history"
 #     AIMessage(content="你好，William！"),
     
 # ]
-
 def run_agent(user_input):
+    tools_used = []  # List to track all tools used
+
     def get_formatted_history():
         memory_variables = memory.load_memory_variables({})
         chat_history = memory_variables.get("chat_history", [])
@@ -74,8 +75,6 @@ def run_agent(user_input):
             return chat_history  # Return the list directly
         return []
 
-    
-    
     intermediate_steps = []
     while True:
         result = agent_chain.invoke({
@@ -83,7 +82,7 @@ def run_agent(user_input):
             "intermediate_steps": intermediate_steps,
             "chat_history": get_formatted_history(),
         })
-        
+
         if isinstance(result, AgentFinish):
             # Convert user input to string and record it
             memory.chat_memory.add_user_message(str(user_input))
@@ -91,12 +90,25 @@ def run_agent(user_input):
             # Extract the AI response
             ai_response = result.return_values.get("output", "")
             
+            # Append tool usage information to the AI's response
+            if tools_used:
+                tool_use_info = f" (Note: Tools used: {', '.join(tools_used)})"
+            else:
+                tool_use_info = " (Note: No tools were used)"
+            
+            ai_response_with_tool_info = ai_response + tool_use_info
+            
             # Record the AI response in the chat memory
-            memory.chat_memory.add_ai_message(str(ai_response))
+            memory.chat_memory.add_ai_message(str(ai_response_with_tool_info))
             
             logging.info(f"Formatted history: {get_formatted_history()}")
-            return result
-        
+
+            # Return the response with tool usage info
+            return ai_response_with_tool_info
+
+        # If a tool is used, add its name to the tools_used list
+        tools_used.append(result.tool)
+
         tool = {
             "get_recipe_field": get_recipe_field,
             "change_field_data": change_field_data,
@@ -113,11 +125,7 @@ def get_answer(question: str):
     # Use the run_agent function to get the result
     result = run_agent(question)
     
-    # Extract the final answer from the result
-    answer = result.return_values.get("output", "No answer available")
-    
     # Return the result in the expected format
     return {
-        "answer": answer,
+        "answer": result,  # The result already includes tool use information
     }
-
