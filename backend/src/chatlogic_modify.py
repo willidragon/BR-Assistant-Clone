@@ -64,8 +64,6 @@ memory = ConversationBufferMemory(return_messages=True,memory_key="chat_history"
     
 # ]
 def run_agent(user_input):
-    tools_used = []  # List to track all tools used
-
     def get_formatted_history():
         memory_variables = memory.load_memory_variables({})
         chat_history = memory_variables.get("chat_history", [])
@@ -76,13 +74,15 @@ def run_agent(user_input):
         return []
 
     intermediate_steps = []
+    tools_used = []
+
     while True:
         result = agent_chain.invoke({
             "input": user_input, 
             "intermediate_steps": intermediate_steps,
             "chat_history": get_formatted_history(),
         })
-
+        
         if isinstance(result, AgentFinish):
             # Convert user input to string and record it
             memory.chat_memory.add_user_message(str(user_input))
@@ -90,30 +90,23 @@ def run_agent(user_input):
             # Extract the AI response
             ai_response = result.return_values.get("output", "")
             
-            # Append tool usage information to the AI's response
-            if tools_used:
-                tool_use_info = f" (Note: Tools used: {', '.join(tools_used)})"
-            else:
-                tool_use_info = " (Note: No tools were used)"
-            
-            ai_response_with_tool_info = ai_response + tool_use_info
-            
             # Record the AI response in the chat memory
-            memory.chat_memory.add_ai_message(str(ai_response_with_tool_info))
+            memory.chat_memory.add_ai_message(str(ai_response))
             
             logging.info(f"Formatted history: {get_formatted_history()}")
-
-            # Return the response with tool usage info
-            return ai_response_with_tool_info
-
-        # If a tool is used, add its name to the tools_used list
-        tools_used.append(result.tool)
+            return {
+                "output": ai_response,
+                "tools_used": ", ".join(tools_used) if tools_used else "No tools used"
+            }
+        
+        tool_name = result.tool
+        tools_used.append(tool_name)
 
         tool = {
             "get_recipe_field": get_recipe_field,
             "change_field_data": change_field_data,
             "list_all_product_ids": list_all_product_ids
-        }[result.tool]
+        }[tool_name]
         observation = tool.run(result.tool_input)
         intermediate_steps.append((result, observation))
 
@@ -121,11 +114,17 @@ def run_agent(user_input):
         memory.chat_memory.add_ai_message(str(observation))
 
 
+
 def get_answer(question: str):
     # Use the run_agent function to get the result
     result = run_agent(question)
     
+    # Extract the final answer and tools used from the result
+    answer = result.get("output", "No answer available")
+    tools_used = result.get("tools_used", "No tools used")
+    
     # Return the result in the expected format
     return {
-        "answer": result,  # The result already includes tool use information
+        "answer": answer,
+        "tools_used": tools_used,
     }

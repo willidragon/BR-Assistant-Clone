@@ -13,14 +13,18 @@ function QuestionForm() {
   const handleQuestionSubmit = async (question) => {
     // Add the question to the chat history
     setChatHistory([...chatHistory, { type: "question", text: question }]);
-
+  
     // Send the question to the API
     const response = await api.post("/chat", { message: question });
-
-    // Add the response to the chat history
+  
+    // Add the response to the chat history with the tools used
     setChatHistory((prevHistory) => [
       ...prevHistory,
-      { type: "response", text: response.data.answer },
+      {
+        type: "response",
+        text: response.data.answer,
+        toolsUsed: response.data.tools_used, // Add the tools used to the chat history
+      },
     ]);
   };
 

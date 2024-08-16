@@ -6,7 +6,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <p>Welcome to chatbot</p>
+        <p>Chat With MPCS</p>
         <QuestionForm />
       </header>
     </div>

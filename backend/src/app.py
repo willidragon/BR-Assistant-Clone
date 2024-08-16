@@ -44,10 +44,11 @@ class Message(BaseModel):
 
 @app.post("/chat", description="Chat with the chatbot")
 def chat(message: Message):
-    response = get_answer(message)
+    response = get_answer(message.message)  # Use message.message to get the string input
     response_content = {
         "input": message.message,
         "answer": response["answer"],
+        "tools_used": response["tools_used"],
     }
 
     return JSONResponse(content=response_content, status_code=200)
