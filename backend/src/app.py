@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 # from src.chatlogic import get_answer
-from src.chatlogic_modify import get_answer
+from src.chatlogic import get_answer
 import logging
 
 
