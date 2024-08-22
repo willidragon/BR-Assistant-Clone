@@ -124,7 +124,7 @@ def get_answer(question: str):
     tools_used = result.get("tools_used", "No tools used")
     
     # Return the result in the expected format
-    return {
+    return { 
         "answer": answer,
         "tools_used": tools_used,
     }
