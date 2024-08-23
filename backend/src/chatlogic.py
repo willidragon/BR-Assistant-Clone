@@ -26,7 +26,7 @@ from src.custom_tools import *
 
 tools = [get_recipe_field, change_field_data, list_all_product_ids]   
 functions = [convert_to_openai_function(tool) for tool in tools]
-memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+
 
 model = ChatOpenAI(
 
@@ -45,11 +45,6 @@ prompt = ChatPromptTemplate.from_messages([
     MessagesPlaceholder(variable_name="agent_scratchpad")
 ])
 
-
-# result1 = chain.invoke({
-#     "input": "可以顯示300@3_CPEUVCDU05MVIA000EM-F這個product ID 的 RECIPE_GROUP 嗎",
-#     "agent_scratchpad": []
-# })
 
 agent_chain = RunnablePassthrough.assign(
     agent_scratchpad= lambda x: format_to_openai_functions(x["intermediate_steps"])
